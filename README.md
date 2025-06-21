@@ -1,4 +1,4 @@
-💻 Laptop Price Scraper (Ryans Computers)
+💻 Laptop Info Scraper (Ryans Computers)
 This Python script scrapes laptop data from ryans.com using Selenium, BeautifulSoup, and Pandas. It collects key details like model name, processor, RAM, storage, GPU, and price across multiple pages, cleans the data, and exports it as a CSV file with clickable product URLs.
 
 🔧 Features
