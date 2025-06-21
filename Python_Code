@@ -1,0 +1,91 @@
+# This part fetches all the data and store them into a pandas datafram
+import pandas as pd
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+df = pd.DataFrame()
+for pages in range(1, 19):
+
+    options = Options()
+    options.add_argument("--headless=new")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--no-sandbox")
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--blink-settings=imagesEnabled=false")
+    options.add_argument("--disable-extensions") 
+    options.add_argument("--disable-infobars")
+    options.add_argument("--disable-notifications")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+
+    driver = webdriver.Chrome(options=options)
+    url = f"https://www.ryans.com/category/laptop-all-laptop?page={pages}"
+    driver.get(url)
+    WebDriverWait(driver, 5).until(
+     
+        EC.presence_of_element_located((By.CLASS_NAME, "card-body"))
+    )
+
+    html_source = driver.page_source
+    driver.quit()
+
+    soup = BeautifulSoup(html_source, 'lxml')
+    divs = soup.find_all('div', class_='card-body text-center')
+
+    name = []
+    processor_Type = []
+    generation = []
+    ram = []
+    storage = []
+    gpu = []
+    price = []
+    for i in divs:
+        a_tag = i.find('a', attrs={'data-bs-toggle': 'tooltip'})
+        url = a_tag['href'] if a_tag and a_tag.has_attr('href') else None
+        title = a_tag.text.strip() if a_tag else None
+        title = title.split('\n', 1)[0].strip()
+        name.append({title: url})  # NAME
+        pro = i.find_all("li", class_='card-text')[0].text
+        pro = pro.split('-', 1)[1].strip()
+        processor_Type.append(pro)  # PROCESSOR_TYPE
+        gen = i.find_all("li", class_='card-text')[1].text
+        gen = gen.split('-', 1)[1].strip()
+        generation.append(gen)  # GENERATION
+        r = i.find_all("li", class_='card-text')[3].text
+        r = r.split('-', 1)[1].strip()
+        ram.append(r)  # RAM
+        store = i.find_all("li", class_='card-text')[4].text
+        store = store.split('-', 1)[1].strip()
+        storage.append(store)  # STORAGE
+        g = i.find_all("li", class_='card-text')[5].text
+        g = g.split('-', 1)[1].strip()
+        gpu.append(g) # GPU
+        pri = i.find("a", class_="pr-text").text
+        pri = pri.split(' ', 1)[1].strip()
+        price.append(pri) # Price
+    dic = {"Name": name, "Price": price, "Processor_Type": processor_Type,
+           "Generation": generation, "Ram": ram, "Storage": storage, "GPU": gpu}
+    d = pd.DataFrame(dic)
+    df = pd.concat([df, d], ignore_index=True)
+
+# From the dataframe, this part cleans and organizes the data.
+df['temp'] = df['Name'].str.strip("{}")
+df[['Model','URL']] = df['temp'].str.split("': '", expand=True)
+df['Model'] = df['Model'].str.strip("'")
+df['URL'] = df['URL'].str.strip("'")
+df['Price'] = df['Price'].str.split(" ").str[0].str.strip()
+df['Price'] = df['Price'].str.replace(',', '')
+df['Price'] = df['Price'].astype(int)
+df['URL'] = df['URL'].apply(lambda x: f'=HYPERLINK("{x}", "Click Here")')
+
+df.drop(columns=['Name', 'temp'], inplace=True)
+
+# This part of the code rearrange the columns and save the datafram as CSV file.
+df = df[['Model', 'Price', 'Processor_Type',
+        'Generation', 'Ram', 'Storage', 'GPU', 'URL']]
+df.to_csv("Revised_Final_Laptop_Dataset.csv", index=False)
