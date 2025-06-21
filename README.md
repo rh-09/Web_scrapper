@@ -16,10 +16,6 @@ This Python script scrapes laptop data from ryans.com using Selenium, BeautifulS
 
 ✅ Converts URLs into Excel-clickable =HYPERLINK() format
 
-✅ Removes commas from price and converts to integer
-
-✅ Rearranges columns for readability
-
 ✅ Saves final dataset as Revised_Final_Laptop_Dataset.csv
 
 CSV export: Revised_Final_Laptop_Dataset.csv
