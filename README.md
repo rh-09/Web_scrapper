@@ -3,6 +3,7 @@ This Python script scrapes laptop data from ryans.com using Selenium, BeautifulS
 
 🔧 Features
 ✅ Scrapes all pages (1–18) of laptop listings
+
 ✅ Extracts:   
    Model Name    
    Processor Type    
@@ -14,8 +15,11 @@ This Python script scrapes laptop data from ryans.com using Selenium, BeautifulS
    Product URL
 
 ✅ Converts URLs into Excel-clickable =HYPERLINK() format
+
 ✅ Removes commas from price and converts to integer
+
 ✅ Rearranges columns for readability
+
 ✅ Saves final dataset as Revised_Final_Laptop_Dataset.csv
 
 CSV export: Revised_Final_Laptop_Dataset.csv
